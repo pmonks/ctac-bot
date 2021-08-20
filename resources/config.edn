@@ -1,0 +1,5 @@
+; Default configuration file - can be overridden via -c command line option
+{
+  :discord-api-token          #env DISCORD_API_TOKEN
+  :discord-event-channel-size #or [#env DISCORD_EVENT_CHANNEL_SIZE 100]   ; Default = 100 queue slots
+}

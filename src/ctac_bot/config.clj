@@ -47,38 +47,34 @@
     (when (and s re)
       (s/split s (re-pattern re)))))
 
-(declare config)
+(defn validated-config-value
+  [m k]
+  (let [result (get m k)]
+    (if-not (s/blank? result)
+      result
+      (throw (ex-info (str "Config key '"(name k)"' not provided") {})))))
+
+(declare  config)
 (defstate config
-          :start (if-let [config-file (:config-file (mnt/args))]
-                   (a/read-config config-file)
-                   (a/read-config (io/resource "config.edn"))))
-
-
-(declare discord-api-token)
-(defstate discord-api-token
-          :start (let [token (:discord-api-token config)]
-                   (if-not (s/blank? token)
-                     token
-                     (throw (ex-info "Discord API token not provided" {})))))
-
-(declare discord-event-channel)
-(defstate discord-event-channel
-          :start (async/chan (:discord-event-channel-size config))
-          :stop  (async/close! discord-event-channel))
-
-(declare discord-connection-channel)
-(defstate discord-connection-channel
-          :start (if-let [connection (dc/connect-bot! discord-api-token discord-event-channel :intents #{:guilds :guild-messages :direct-messages})]
-                   connection
-                   (throw (ex-info "Failed to connect bot to Discord" {})))
-          :stop  (dc/disconnect-bot! discord-connection-channel))
-
-(declare discord-message-channel)
-(defstate discord-message-channel
-          :start (if-let [connection (dm/start-connection! discord-api-token)]
-                   connection
-                   (throw (ex-info "Failed to connect to Discord message channel" {})))
-          :stop  (dm/stop-connection! discord-message-channel))
+          :start (let [raw-config            (if-let [config-file (:config-file (mnt/args))]
+                                               (a/read-config config-file)
+                                               (a/read-config (io/resource "config.edn")))
+                       discord-api-token     (validated-config-value raw-config :discord-api-token)
+                       discord-event-channel (async/chan (u/getrn raw-config :discord-event-channel-size 100))]
+                   {
+                     :discord-event-channel              discord-event-channel
+                     :discord-connection-channel         (if-let [connection (dc/connect-bot! discord-api-token
+                                                                                              discord-event-channel
+                                                                                              :intents #{:guilds :guild-messages :direct-messages})]
+                                                           connection
+                                                           (throw (ex-info "Failed to connect bot to Discord" {})))
+                     :discord-message-channel            (if-let [connection (dm/start-connection! discord-api-token)]
+                                                           connection
+                                                           (throw (ex-info "Failed to connect to Discord message channel" {})))
+                   })
+          :stop (async/close!        (:discord-event-channel      config))
+                (dc/disconnect-bot!  (:discord-connection-channel config))
+                (dm/stop-connection! (:discord-message-channel    config)))
 
 
 ; Note: do NOT use mount for these, since they're used before mount has started

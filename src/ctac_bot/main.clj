@@ -64,7 +64,7 @@
       (mnt/with-args options)
       (mnt/start)
       (log/info "ctac-bot started")
-      (de/message-pump! cfg/discord-event-channel chat/handle-discord-event))   ; This must go last, as it blocks
+      (de/message-pump! (:discord-event-channel cfg/config) chat/handle-discord-event))   ; This must go last, as it blocks
     (catch Exception e
       (u/log-exception e)
       (u/exit -1)))

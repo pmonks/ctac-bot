@@ -8,28 +8,9 @@
 
 # ctac-bot
 
-A small [Discord](https://discord.com/) bot that you can send Clojure code to, to experiment with the language, demonstrate core language principles, or just mess about.  Note: only supports the subset of Clojure's core provided by the [Small Clojure Interpreter](https://github.com/borkdude/sci).
+A small [Discord](https://discord.com/) bot specifically designed to support a single server. This repo is probably not of interest unless you're a developer who's in that server.
 
 Please review the [privacy policy](https://github.com/pmonks/ctac-bot/blob/main/PRIVACY.md) before interacting with the bot.
-
-## Adding the Bot to Your Discord Server
-
-If you're an administrator of a server, [click here](https://discord.com/oauth2/authorize?client_id=854190844084355082&scope=bot&permissions=2148006976) and follow the instructions.  You will also need to ensure that the bot has permissions to read, create and delete messages from other people in every channel you want to use it in.
-
-## Running Your Own Copy of the Bot
-
-### Obtaining API Keys
-
-Configure a Discord bot using the [Discord developer portal](https://discord.com/developers), obtaining an API key.  Detailed instructions on this process are provided in the [`discljord` project](https://github.com/IGJoshua/discljord).
-
-### Running the Bot
-
-Currently the bot is only distributed in source form, so regardless of how you intend to deploy it, you'll need to clone this repository locally.
-
-#### Direct Execution
-
-1. Either set environment variables as described in the default [`config.edn` file](https://github.com/pmonks/ctac-bot/blob/main/resources/config.edn), or copy that file somewhere else and hardcode the values in the file directly.
-2. If you set the environment variables in the previous step run `clj -M:run`, otherwise run `clj -M:run -c /path/to/your/config.edn`
 
 ## Contributor Information
 

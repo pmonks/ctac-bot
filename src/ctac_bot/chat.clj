@@ -18,6 +18,7 @@
 
 (ns ctac-bot.chat
   (:require [clojure.string               :as s]
+            [clojure.instant              :as inst]
             [clojure.tools.logging        :as log]
             [java-time                    :as tm]
             [discljord.formatting         :as df]
@@ -38,28 +39,47 @@
               :icon_url embed-template-logo-url}
   :timestamp (str (tm/instant))})
 
+(defn lookup-command!
+  "Provides links that look up a person on various internet platforms"
+  [^String args event-data]
+  (if (not (s/blank? args))
+    (let [name-qs (java.net.URLEncoder/encode args "UTF-8")]
+      (mu/create-message! (:discord-message-channel cfg/config)
+                          (:channel-id event-data)
+                          :embed (assoc (embed-template)
+                                        :description (str "Here's what the internet has to say about " args ":\n"
+                                                          " • [Nextdoor](https://nextdoor.com/search/neighbors/?query=" name-qs ")\n"
+                                                          " • [Facebook](https://www.facebook.com/search/people/?q=" name-qs ")\n"
+                                                          " • [LinkedIn](https://www.linkedin.com/search/results/people/?keywords=" name-qs ")\n"
+                                                          " • [Google](https://www.google.com/search?q=amador+county+" name-qs ")"))))
+    (mu/create-message! (:discord-message-channel cfg/config)
+                        (:channel-id event-data)
+                        :embed (assoc (embed-template)
+                                      :description (str "I need to know who you want to look up. For example: `" prefix "lookup Santa Claus`")))))
+
 (defn move-command!
   "Moves a conversation to the specified channel"
   [args event-data]
   (when (not (mu/direct-message? event-data))   ; Only respond if the message was sent to a real channel in a server (i.e. not in a DM)
-    (let [guild-id   (:guild-id event-data)
-          channel-id (:channel-id event-data)
-          message-id (:id event-data)]
-      (mu/delete-message! cfg/discord-message-channel channel-id message-id)
+    (let [guild-id                (:guild-id event-data)
+          channel-id              (:channel-id event-data)
+          discord-message-channel (:discord-message-channel cfg/config)]
       (if (not (s/blank? args))
         (if-let [target-channel-id (second (re-find df/channel-mention args))]
           (if (not= channel-id target-channel-id)
-            (let [target-message-id  (:id (mu/create-message! cfg/discord-message-channel
+            (let [move-message-id    (:id event-data)
+                  _                  (mu/delete-message! discord-message-channel channel-id move-message-id)   ; Don't delete the original message unless we've validated everything
+                  target-message-id  (:id (mu/create-message! discord-message-channel
                                                               target-channel-id
                                                               :embed (assoc (embed-template)
                                                                             :description (str "Continuing the conversation from " (mu/channel-link channel-id) "..."))))
                   target-message-url (mu/message-url guild-id target-channel-id target-message-id)
-                  source-message-id  (:id (mu/create-message! cfg/discord-message-channel
+                  source-message-id  (:id (mu/create-message! discord-message-channel
                                                               channel-id
                                                               :embed (assoc (embed-template)
                                                                             :description (str "Let's continue this conversation in " (mu/channel-link target-channel-id) " ([link](" target-message-url "))."))))
                   source-message-url (mu/message-url guild-id channel-id source-message-id)]
-              (mu/edit-message! cfg/discord-message-channel
+              (mu/edit-message! discord-message-channel
                                 target-channel-id
                                 target-message-id
                                 :embed (assoc (embed-template)
@@ -68,10 +88,59 @@
           (log/warn "Could not find target channel in move command."))
         (log/warn "move-command! arguments missing a target channel.")))))
 
+(defn epoch-command!
+  "Displays the 'epoch seconds' value of the given date (in RFC-3339 format), or now if no value is provided."
+  [args event-data]
+  (let [channel-id (:channel-id event-data)]
+    (try
+      (let [d     (if (s/blank? args) (java.util.Date.) (inst/read-instant-date args))
+            epoch (long (/ (.getTime ^java.util.Date d) 1000))]
+        (mu/create-message! (:discord-message-channel cfg/config)
+                            channel-id
+                            :embed (assoc (embed-template) :description (str "`" epoch "`"))))
+      (catch RuntimeException re
+        (mu/create-message! (:discord-message-channel cfg/config)
+                            channel-id
+                            :embed (assoc (embed-template) :description (.getMessage re)))))))
+
+(defn dmath-command!
+  "Displays the result of the given date math expression e.g. now + 1 day"
+  [args event-data]
+  (let [channel-id (:channel-id event-data)]
+    (try
+      (let [[b o v u]  (s/split (s/lower-case (s/trim args)) #"\s+")
+            base       (if (= b "now") (.getEpochSecond (tm/instant)) (u/parse-int b))
+            op         (case o
+                         "-" -
+                         "+" +
+                         nil)
+            val        (u/parse-int v)
+            multiplier (case u
+                         ("m" "min" "mins" "minutes") 60
+                         ("h" "hr" "hrs" "hours")     (* 60 60)
+                         ("d" "day" "days")           (* 60 60 24)
+                         ("w" "wk" "wks" "weeks")     (* 60 60 24 7)
+                         1)]  ; Default to seconds
+        (if base
+          (if (and op val multiplier)  ; Everything was provided - evaluate the expression
+            (mu/create-message! (:discord-message-channel cfg/config)
+                                channel-id
+                                :embed (assoc (embed-template) :description (str "`" (op base (* val multiplier)) "`")))
+            (if-not (or op val)  ; Only base was provided - display it
+              (mu/create-message! (:discord-message-channel cfg/config)
+                                  channel-id
+                                  :embed (assoc (embed-template) :description (str "`" base "`")))
+              (throw (ex-info "Op, val or multiplier not provided" {}))))
+          (throw (ex-info "Base not provided" {}))))
+      (catch Exception e
+        (mu/create-message! (:discord-message-channel cfg/config)
+                            channel-id
+                            :embed (assoc (embed-template) :description (str "Unable to parse date math expression: `" args "`")))))))
+
 (defn privacy-command!
   "Provides a link to the ctac-bot privacy policy"
   [_ event-data]
-  (mu/create-message! cfg/discord-message-channel
+  (mu/create-message! (:discord-message-channel cfg/config)
                       (:channel-id event-data)
                       :embed (assoc (embed-template)
                                     :description "[ctac-bot's privacy policy is available here](https://github.com/pmonks/ctac-bot/blob/main/PRIVACY.md).")))
@@ -80,7 +149,7 @@
   "Provides technical status of ctac-bot"
   [_ event-data]
   (let [now (tm/instant)]
-    (mu/create-message! cfg/discord-message-channel
+    (mu/create-message! (:discord-message-channel cfg/config)
                         (:channel-id event-data)
                         :embed (assoc (embed-template)
                                       :title "ctac-bot Status"
@@ -101,7 +170,7 @@
   "Requests that the JVM perform a GC cycle."
   [_ event-data]
   (System/gc)
-  (mu/create-message! cfg/discord-message-channel
+  (mu/create-message! (:discord-message-channel cfg/config)
                       (:channel-id event-data)
                       :content "Garbage collection requested."))
 
@@ -112,19 +181,19 @@
     (if level
       (do
         (cfg/set-log-level! level (if logger logger "ctac-bot"))
-        (mu/create-message! cfg/discord-message-channel
+        (mu/create-message! (:discord-message-channel cfg/config)
                             (:channel-id event-data)
                             :content (str "Logging level " (s/upper-case level) " set" (if logger (str " for logger '" logger "'") "for logger 'ctac-bot'") ".")))
-      (mu/create-message! cfg/discord-message-channel
-                            (:channel-id event-data)
-                            :content "Logging level not provided; must be one of: ERROR, WARN, INFO, DEBUG, TRACE"))))
+      (mu/create-message! (:discord-message-channel cfg/config)
+                          (:channel-id event-data)
+                          :content "Logging level not provided; must be one of: ERROR, WARN, INFO, DEBUG, TRACE"))))
 
 (defn debug-logging-command!
   "Enables debug logging, which turns on TRACE for 'discljord' and DEBUG for 'ctac-bot'."
   [_ event-data]
   (cfg/set-log-level! "TRACE" "discljord")
   (cfg/set-log-level! "DEBUG" "ctac-bot")
-  (mu/create-message! cfg/discord-message-channel
+  (mu/create-message! (:discord-message-channel cfg/config)
                       (:channel-id event-data)
                       :content "Debug logging enabled (TRACE for 'discljord' and DEBUG for 'ctac-bot'."))
 
@@ -132,22 +201,23 @@
   "Resets all log levels to their configured defaults."
   [_ event-data]
   (cfg/reset-logging!)
-  (mu/create-message! cfg/discord-message-channel
+  (mu/create-message! (:discord-message-channel cfg/config)
                       (:channel-id event-data)
                       :content "Logging configuration reset."))
 
 
-; Table of "public" commands; those that can be used in any channel, group or DM
-(def public-command-dispatch-table
-  {"move" #'move-command!})
-
 (declare help-command!)
 
-; Table of "private" commands; those that can only be used in a DM channel
-(def private-command-dispatch-table
-  {"help"    #'help-command!
+; Table of "public" commands; those that can be used in any channel, group or DM
+(def public-command-dispatch-table
+  {"lookup" #'lookup-command!
+   "move"   #'move-command!
+   "epoch"  #'epoch-command!
+   "dmath"  #'dmath-command!
+   "help"    #'help-command!
    "privacy" #'privacy-command!})
 
+; Table of "secret" commands; those that don't show up in the help and can only be used in a DM
 (def secret-command-dispatch-table
   {"status"       #'status-command!
    "gc"           #'gc-command!
@@ -158,15 +228,12 @@
 (defn help-command!
   "Displays this help message"
   [_ event-data]
-  (mu/create-message! cfg/discord-message-channel
+  (mu/create-message! (:discord-message-channel cfg/config)
                       (:channel-id event-data)
                       :embed (assoc (embed-template)
-                                    :description (str "I understand the following commands in any channel or DM:\n"
+                                    :description (str "I understand the following command(s):\n"
                                                       (s/join "\n" (map #(str " • **`" prefix (key %) "`** - " (:doc (meta (val %))))
-                                                                        (sort-by key public-command-dispatch-table)))
-                                                      "\n\nAnd the following commands only in a DM:\n"
-                                                      (s/join "\n" (map #(str " • **`" prefix (key %) "`** - " (:doc (meta (val %))))
-                                                                        (sort-by key private-command-dispatch-table)))))))
+                                                                        (sort-by key public-command-dispatch-table)))))))
 
 ; Responsive fns
 (defmulti handle-discord-event
@@ -194,17 +261,13 @@
                   (log/debug (str "Calling public command fn for '" command "' with args '" args "'."))
                   (public-command-fn args event-data))
                 (when (mu/direct-message? event-data)
-                  (if-let [private-command-fn (get private-command-dispatch-table command)]
+                  (if-let [secret-command-fn (get secret-command-dispatch-table command)]
                     (do
-                      (log/debug (str "Calling private command fn for '" command "' with args '" args "'."))
-                      (private-command-fn args event-data))
-                    (if-let [secret-command-fn (get secret-command-dispatch-table command)]
-                      (do
-                        (log/debug (str "Calling secret command fn for '" command "' with args '" args "'."))
-                        (secret-command-fn args event-data))
-                      (help-command! nil event-data))))))   ; If the requested private command doesn't exist, provide help
+                      (log/debug (str "Calling secret command fn for '" command "' with args '" args "'."))
+                      (secret-command-fn args event-data))
+                    (help-command! nil event-data)))))   ; If the requested secret command doesn't exist, provide help
             ; If any unrecognised message was sent to a DM channel, provide help
-            (when-not (:guild-id event-data)
+            (when (mu/direct-message? event-data)
               (help-command! nil event-data))))
         (catch Exception e
           (u/log-exception e))))))

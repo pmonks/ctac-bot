@@ -31,7 +31,7 @@
     mount/mount                         {:mvn/version "0.1.16"}
     org.suskalo/discljord               {:mvn/version "1.2.3"}
     pmonks/discljord-utils              {:git/url "https://github.com/pmonks/discljord-utils.git"
-                                         :git/sha "493d28d793dc0041ffa76258d7a7f7b23c9b2816"}}
+                                         :git/sha "b95e523d2a96db31de82287ac72e63a3a6c1986d"}}
  :aliases
    {; clj -M:run -c /path/to/config.edn
     :run

@@ -1,5 +1,10 @@
 ; Default configuration file - can be overridden via -c command line option
 {
+  :bot {
+    :ns   "ctac-bot.commands"
+    :logo "https://cdn.discordapp.com/icons/875378609567698994/e141f7835fec7526bb36be1824134fb9.png"
+  }
+
   :discord-api-token          #env DISCORD_API_TOKEN
   :discord-event-channel-size #or [#env DISCORD_EVENT_CHANNEL_SIZE 100]   ; Default = 100 queue slots
 }

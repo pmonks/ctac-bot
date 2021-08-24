@@ -19,23 +19,13 @@
 {:paths ["src" "resources"]
  :deps
    {org.clojure/clojure                 {:mvn/version "1.10.3"}
-    org.clojars.pmonks/clj-2253         {:mvn/version "0.1.0"}
-    org.clojure/tools.logging           {:mvn/version "1.1.0"}
-    ch.qos.logback/logback-classic      {:mvn/version "1.2.5"}
-    org.slf4j/jcl-over-slf4j            {:mvn/version "1.7.32"}
-    org.slf4j/log4j-over-slf4j          {:mvn/version "1.7.32"}
-    org.slf4j/jul-to-slf4j              {:mvn/version "1.7.32"}
     clojure.java-time/clojure.java-time {:mvn/version "0.3.2"}
-    org.clojure/tools.cli               {:mvn/version "1.0.206"}
-    aero/aero                           {:mvn/version "1.1.6"}
-    mount/mount                         {:mvn/version "0.1.16"}
-    org.suskalo/discljord               {:mvn/version "1.2.3"}
     pmonks/discljord-utils              {:git/url "https://github.com/pmonks/discljord-utils.git"
-                                         :git/sha "b95e523d2a96db31de82287ac72e63a3a6c1986d"}}
+                                         :git/sha "e1a23d41ffacdffffc099380fa722a39e2749aba"}}
  :aliases
    {; clj -M:run -c /path/to/config.edn
     :run
-      {:main-opts ["-m" "ctac-bot.main"]}
+      {:main-opts ["-m" "bot.main"]}
 
     ; clj -X:uberjar
     :uberjar
@@ -43,7 +33,7 @@
        :exec-fn      hf.depstar/uberjar
        :exec-args    {:jar        "./target/ctac-bot-standalone.jar"
                       :jar-type   :uber
-                      :main-class "ctac-bot.main"
+                      :main-class "bot.main"
                       :aot        true}}
 
     ; clj -M:check

@@ -18,10 +18,9 @@
 
 {:paths ["src" "resources"]
  :deps
-   {org.clojure/clojure                 {:mvn/version "1.10.3"}
-    clojure.java-time/clojure.java-time {:mvn/version "0.3.2"}
-    pmonks/discljord-utils              {:git/url "https://github.com/pmonks/discljord-utils.git"
-                                         :git/sha "e1a23d41ffacdffffc099380fa722a39e2749aba"}}
+   {org.clojure/clojure    {:mvn/version "1.10.3"}
+    pmonks/discljord-utils {:git/url "https://github.com/pmonks/discljord-utils.git"
+                            :git/sha "e1a23d41ffacdffffc099380fa722a39e2749aba"}}
  :aliases
    {; clj -M:run -c /path/to/config.edn
     :run

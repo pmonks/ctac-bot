@@ -20,7 +20,7 @@
  :deps
    {org.clojure/clojure    {:mvn/version "1.10.3"}
     pmonks/discljord-utils {:git/url "https://github.com/pmonks/discljord-utils.git"
-                            :git/sha "92e48d38f74f77b0e55c6d15bba42615a9fe707b"}}
+                            :git/sha "955fd20665f1d4e3ca8a2fa41114dfe0f68a030d"}}
  :aliases
    {; clj -M:run -c /path/to/config.edn
     :run

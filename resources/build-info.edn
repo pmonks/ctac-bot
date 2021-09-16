@@ -1,6 +1,6 @@
 {
   :repo "https://github.com/pmonks/ctac-bot.git"
-  :sha  "1ee9cf8913d97fc0daa93da9078749cd6745f1cd"
-  :tag  "v0.1.20210824"
-  :date #inst "2021-08-24T07:26:44Z"
+  :sha  "5d6213de28d97fa5f16803c1534a4a5c2fd2343a"
+  :tag  "v0.1.20210916"
+  :date #inst "2021-09-16T20:00:31Z"
 }

@@ -20,7 +20,7 @@
  :deps
    {org.clojure/clojure    {:mvn/version "1.10.3"}
     pmonks/discljord-utils {:git/url "https://github.com/pmonks/discljord-utils.git"
-                            :git/sha "0f62f84b66285b244669ecdc1029ef9212ae3239"}}
+                            :git/sha "ba4faa9a9f164eff6bd18ebf7893c7b260d3ba56"}}
  :aliases
    {; clj -M:run -c /path/to/config.edn
     :run
@@ -28,7 +28,7 @@
 
     ; clj -X:uberjar
     :uberjar
-      {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.297"}}
+      {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.303"}}
        :exec-fn      hf.depstar/uberjar
        :exec-args    {:jar        "./target/ctac-bot-standalone.jar"
                       :jar-type   :uber
@@ -54,5 +54,5 @@
 
     ; clj -M:outdated
     :outdated
-      {:extra-deps {com.github.liquidz/antq {:mvn/version "1.0.0"}}
+      {:extra-deps {com.github.liquidz/antq {:mvn/version "1.0.1"}}
        :main-opts  ["-m" "antq.core"]}}}

@@ -20,7 +20,7 @@
  :deps
    {org.clojure/clojure    {:mvn/version "1.10.3"}
     pmonks/discljord-utils {:git/url "https://github.com/pmonks/discljord-utils.git"
-                            :git/sha "d71076a6109c57f78737fffd8465a6c5b508b129"}}
+                            :git/sha "610bc6c5e4b2711f08321b0fe0c2256e441c2a3a"}}
  :aliases
    {; clj -M:run -c /path/to/config.edn
     :run
@@ -44,7 +44,7 @@
 
     ; clj -M:kondo
     :kondo
-      {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2021.09.15"}}
+      {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2021.09.25"}}
        :main-opts  ["-m" "clj-kondo.main" "--lint" "src" "resources"]}
 
     ; clj -M:eastwood

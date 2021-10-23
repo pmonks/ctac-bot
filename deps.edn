@@ -18,9 +18,8 @@
 
 {:paths ["src" "resources"]
  :deps
-   {org.clojure/clojure    {:mvn/version "1.10.3"}
-    pmonks/discljord-utils {:git/url "https://github.com/pmonks/discljord-utils.git"
-                            :git/sha "610bc6c5e4b2711f08321b0fe0c2256e441c2a3a"}}
+   {org.clojure/clojure               {:mvn/version "1.10.3"}
+    com.github.pmonks/discljord-utils {:git/sha "610bc6c5e4b2711f08321b0fe0c2256e441c2a3a"}}
  :aliases
    {; ---- TOOL ALIASES ----
 

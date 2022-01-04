@@ -1,7 +1,7 @@
-| | | | |
-|---:|:---:|:---:|:---:|
-| [**main**](https://github.com/pmonks/ctac-bot/tree/main) | [![Build](https://github.com/pmonks/ctac-bot/workflows/build/badge.svg?branch=main)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Abuild) | [![Lint](https://github.com/pmonks/ctac-bot/workflows/lint/badge.svg?branch=main)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Alint) | [![Dependencies](https://github.com/pmonks/ctac-bot/workflows/dependencies/badge.svg?branch=main)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Adependencies) |
-| [**dev**](https://github.com/pmonks/ctac-bot/tree/dev)  | [![Build](https://github.com/pmonks/ctac-bot/workflows/build/badge.svg?branch=dev)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Abuild) | [![Lint](https://github.com/pmonks/ctac-bot/workflows/lint/badge.svg?branch=dev)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Alint) | [![Dependencies](https://github.com/pmonks/ctac-bot/workflows/dependencies/badge.svg?branch=dev)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Adependencies) |
+| | | |
+|---:|:---:|:---:|
+| [**main**](https://github.com/pmonks/ctac-bot/tree/main) | [![CI](https://github.com/pmonks/ctac-bot/workflows/CI/badge.svg?branch=main)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3ACI+branch%3Amain) | [![Dependencies](https://github.com/pmonks/ctac-bot/workflows/dependencies/badge.svg?branch=main)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Adependencies+branch%3Amain) |
+| [**dev**](https://github.com/pmonks/ctac-bot/tree/dev) | [![CI](https://github.com/pmonks/ctac-bot/workflows/CI/badge.svg?branch=dev)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3ACI+branch%3Adev) | [![Dependencies](https://github.com/pmonks/ctac-bot/workflows/dependencies/badge.svg?branch=dev)](https://github.com/pmonks/ctac-bot/actions?query=workflow%3Adependencies+branch%3Adev) |
 
 [![Open Issues](https://img.shields.io/github/issues/pmonks/ctac-bot.svg)](https://github.com/pmonks/ctac-bot/issues)
 [![License](https://img.shields.io/github/license/pmonks/ctac-bot.svg)](https://github.com/pmonks/ctac-bot/blob/main/LICENSE)

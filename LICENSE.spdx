@@ -1,7 +1,7 @@
 SPDXVersion: SPDX-2.1
 DataLicense: CC0-1.0
 Creator: Peter Monks
-PackageName: ctac-bot
+PackageName: com.github.pmonks/ctac-bot
 PackageOriginator: Peter Monks
 PackageHomePage: https://github.com/pmonks/ctac-bot
 PackageLicenseDeclared: Apache-2.0

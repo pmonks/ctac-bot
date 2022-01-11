@@ -1,8 +1,6 @@
 name: dependencies
 on:
   push:
-    branches:
-      - '!main'
   pull_request:
   schedule:
     - cron: '0 21 * * 0'

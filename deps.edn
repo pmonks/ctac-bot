@@ -21,12 +21,12 @@
    {org.clojure/clojure               {:mvn/version "1.11.1"}
     com.github.pmonks/discljord-utils {:mvn/version "1.0.91"}}
  :aliases
-   {:build {:deps       {io.github.clojure/tools.build {:git/tag "v0.9.5" :git/sha "24f2894"}
+   {:build {:deps       {io.github.clojure/tools.build {:git/tag "v0.9.6" :git/sha "8e78bcc"}
                          com.github.pmonks/pbr         {:mvn/version "RELEASE"}}
             :ns-default pbr.build}
 
     ; clj -T:run <taskname> :config-file "<PATH_TO_CONFIG_FILE>"
-    :run   {:deps       {io.github.clojure/tools.build {:git/tag "v0.9.5" :git/sha "24f2894"}
+    :run   {:deps       {io.github.clojure/tools.build {:git/tag "v0.9.6" :git/sha "8e78bcc"}
                          com.github.pmonks/pbr         {:mvn/version "RELEASE"}
                          com.github.pmonks/ctac-bot    {:local/root "."}}
             :ns-default run}
